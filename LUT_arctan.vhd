@@ -14,42 +14,42 @@ END LUT_arctan;
 -- arctan (2**(-i)) for i in range 15
 -- hasil dari arctan (2**(-i)) dengan iterasi sebanyak 16 kali
 Architecture LUT OF LUT_arctan IS 
-    BEGIN
-        process (i)
-        -- hasil = fix point 16 bit
-        begin
-            if i = 0 then
+BEGIN
+PROCESS (iterasi)
+	BEGIN
+        CASE iterasi IS
+            WHEN "0000" =>
                 hasil <= x"FFFF"; -- 45.00 derajat
-            elsif i = 1 then
+            when "0001" =>
                 hasil <= x"FFFF"; -- 26.565 derajat
-            elsif i = 2 then
+            WHEN "0010" =>
                 hasil <= x"FFFF"; -- 14.036 derajat
-            elsif i = 3 then
+            WHEN "0011" =>
                 hasil <= x"FFFF"; -- 7.125 derajat
-            elsif i = 4 then
+            WHEN "0100" =>
                 hasil <= x"FFFF"; -- 3.576 derajat
-            elsif i = 5 then
+            WHEN "0101" =>
                 hasil <= x"FFFF"; -- 1.789 derajat
-            elsif i = 6 then
+            WHEN "0110" =>
                 hasil <= x"E4BF"; -- 0.895 derajat
-            elsif i = 7 then
+            WHEN "0111" =>
                 hasil <= x"725F"; -- 0.447 derajat
-            elsif i = 8 then
+            WHEN "1000" =>
                 hasil <= x"3907"; -- 0.223 derajat
-            elsif i = 9 then
+            WHEN "1001" =>
                 hasil <= x"1C6A"; -- 0.111 derajat
-            elsif i = 10 then
+            WHEN "1010" =>
                 hasil <= x"0E14"; -- 0.055 derajat
-            elsif i = 11 then
+            WHEN "1011" =>
                 hasil <= x"06E9"; -- 0.027 derajat
-            elsif i = 12 then
+            WHEN "1100" =>
                 hasil <= x"0354"; -- 0.013 derajat
-            elsif i = 13 then
+            WHEN "1101" =>
                 hasil <= x"0189"; -- 0.006 derajat
-            elsif i = 14 then
+            WHEN "1110" =>
                 hasil <= x"00C5"; -- 0.003 derajat
-            elsif i = 15 then
+            WHEN "1111" =>
                 hasil <= x"0042"; -- 0.001 derajat
-            end if;
-        end process;
-    end LUT;
+        END CASE;
+    END PROCESS;
+END LUT;
