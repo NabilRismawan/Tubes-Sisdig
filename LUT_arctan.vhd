@@ -1,77 +1,57 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
+-- Ini adalah fungsi look up table dari arctan
 
-entity cordic_arccos is
-    Port (
-        reset : in STD_LOGIC;
-        clock : in STD_LOGIC;
-        input_angle : in STD_LOGIC_VECTOR(15 downto 0);
-        output_angle : out STD_LOGIC_VECTOR(15 downto 0)
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE ieee.std_logic_arith.ALL;
+USE ieee.std_logic_unsigned.ALL;
+
+ENTITY LUT_arctan IS
+    PORT(
+    iterasi : IN STD_LOGIC_VECTOR (3 downto 0);
+    hasil : OUT STD_LOGIC_VECTOR (15 downto 0)
     );
-end cordic_arccos;
+END LUT_arctan;
 
-architecture Behavioral of cordic_arccos is
 
-    component LUT_arctan
-        Port (
-            iterasi : in STD_LOGIC_VECTOR(3 downto 0);
-            hasil : out STD_LOGIC_VECTOR(15 downto 0)
-        );
-    end component;
-
-    signal iterasi : STD_LOGIC_VECTOR(3 downto 0) := "0000";
-    signal hasil : STD_LOGIC_VECTOR(15 downto 0);
-    signal y_o : STD_LOGIC_VECTOR(15 downto 0) := "1011011001000110"; -- 0.707 in Q1.15
-    signal x_o : STD_LOGIC_VECTOR(15 downto 0) := "0000000000000000"; -- 0 in Q1.15
-    signal theta_o : STD_LOGIC_VECTOR(15 downto 0) := "0000000000000000"; -- Initial angle
-    signal shx, shy : STD_LOGIC_VECTOR(15 downto 0);
-    signal theta : STD_LOGIC_VECTOR(15 downto 0);
-
-begin
-
-    LUT_arctan_inst: entity work.LUT_arctan
-        port map(
-            iterasi => iterasi,
-            hasil => hasil
-        );
-
-    process(reset, clock)
-        variable x : STD_LOGIC_VECTOR(15 downto 0);
-        variable y : STD_LOGIC_VECTOR(15 downto 0);
-        variable theta_var : STD_LOGIC_VECTOR(15 downto 0);
-    begin
-        if reset = '1' then
-            y_o <= "1011011001000110"; -- Reset y_o to 0.707 (Q1.15 format)
-            x_o <= "0000000000000000"; -- Reset x_o to 0
-            theta_o <= "0000000000000000"; -- Reset theta_o to 0
-            iterasi <= "0000"; -- Reset iteration counter
-        elsif rising_edge(clock) then
-            -- Shift right operations for x and y
-            shx <= std_logic_vector(signed(x_o) srl to_integer(unsigned(iterasi)));
-            shy <= std_logic_vector(signed(y_o) srl to_integer(unsigned(iterasi)));
-
-            -- Perform the CORDIC rotation
-            if y_o(15) = '0' then
-                x_o <= std_logic_vector(signed(x_o) + signed(shy));
-                y_o <= std_logic_vector(signed(y_o) - signed(shx));
-                theta_o <= std_logic_vector(signed(theta_o) + signed(hasil));
-            else
-                x_o <= std_logic_vector(signed(x_o) - signed(shy));
-                y_o <= std_logic_vector(signed(y_o) + signed(shx));
-                theta_o <= std_logic_vector(signed(theta_o) - signed(hasil));
-            end if;
-
-            -- Increment iteration
-            if iterasi < "1111" then
-                iterasi <= std_logic_vector(unsigned(iterasi) + 1);
-            else
-                iterasi <= iterasi; -- Hold at maximum iteration
-            end if;
-        end if;
-    end process;
-
-    -- Assign final angle output
-    output_angle <= theta_o;
-
-end Behavioral;
+-- arctan (2**(-i)) for i in range 15
+-- hasil dari arctan (2**(-i)) dengan iterasi sebanyak 16 kali
+Architecture LUT OF LUT_arctan IS 
+BEGIN
+PROCESS (iterasi)
+	BEGIN
+        CASE iterasi IS
+            WHEN "0000" =>
+                hasil <= x"FFFF"; -- 45.00 derajat
+            when "0001" =>
+                hasil <= x"FFFF"; -- 26.565 derajat
+            WHEN "0010" =>
+                hasil <= x"FFFF"; -- 14.036 derajat
+            WHEN "0011" =>
+                hasil <= x"FFFF"; -- 7.125 derajat
+            WHEN "0100" =>
+                hasil <= x"FFFF"; -- 3.576 derajat
+            WHEN "0101" =>
+                hasil <= x"FFFF"; -- 1.789 derajat
+            WHEN "0110" =>
+                hasil <= x"E4BF"; -- 0.895 derajat
+            WHEN "0111" =>
+                hasil <= x"725F"; -- 0.447 derajat
+            WHEN "1000" =>
+                hasil <= x"3907"; -- 0.223 derajat
+            WHEN "1001" =>
+                hasil <= x"1C6A"; -- 0.111 derajat
+            WHEN "1010" =>
+                hasil <= x"0E14"; -- 0.055 derajat
+            WHEN "1011" =>
+                hasil <= x"06E9"; -- 0.027 derajat
+            WHEN "1100" =>
+                hasil <= x"0354"; -- 0.013 derajat
+            WHEN "1101" =>
+                hasil <= x"0189"; -- 0.006 derajat
+            WHEN "1110" =>
+                hasil <= x"00C5"; -- 0.003 derajat
+            WHEN "1111" =>
+                hasil <= x"0042"; -- 0.001 derajat
+        END CASE;
+    END PROCESS;
+END LUT;
